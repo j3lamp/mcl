@@ -1,6 +1,6 @@
-#+Title: The Missing CMake Library
+* Title: The Missing CMake Library
 A collection of useful cmake functions, macros, and utilities.
 
-* Here be Dragons!
+** Here be Dragons!
 This code is currently at version *-1* so it may not be useful yet. Use at your
 own risk, or at elast jsut for fun.
