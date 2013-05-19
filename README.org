@@ -1,4 +1,4 @@
-* Title: The Missing CMake Library
+* The Missing CMake Library
 A collection of useful cmake functions, macros, and utilities.
 
 ** Here be Dragons!
