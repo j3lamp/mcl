@@ -11,12 +11,12 @@
 #=============================================================================
 
 #!
-# Usage: cml_map(<operation> <map> [arguments])
+# Usage: mcl_map(<operation> <map> [arguments])
 #
 # Operations:
-#   SET <map> <key> <value> [<value> ...] [GLOBAL]
+#   SET <map> <key> <value> [<value>...] [GLOBAL]
 #     Set a list of values for <key> in <map>. If GLOBAL then the map is stored
-#     as a global varialble.
+#     as a global variable.
 #
 #   GET <map> <key> <variable>
 #     Set <variable> to the value associated iwth <key> in map <map>.
