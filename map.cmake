@@ -87,12 +87,13 @@ function(mcl_map operation map thirdArg)
                                 "Function signature is map(CONTAINS <map> <key>"
                                 "<variable>).")
         else()
-            message(FATAL_ERROR "Map CONTAINSE has extra arguments. Function"
-                                "signature is map(CONTAINS <map> <key> <variable>).")
+            message(FATAL_ERROR "Map CONTAINS has extra arguments. Function"
+                                "signature is map(CONTAINS <map> <key> "
+                                "<variable>).")
         endif()
 
     else()
-        message(FATAL_ERROR "Invalid map operation '${operation}'. Valid"
+        message(FATAL_ERROR "Invalid MCL map operation '${operation}'. Valid"
                             "operations are: SET, GET, MAKE, KEYS, and CONTAINS")
     endif()
 endfunction()

@@ -15,7 +15,7 @@ include(mcl/map)
 
 macro(EXPECT_MAP_CONTAIN map key)
     mcl_map(KEYS ${map} _keys)
-    mcl_list_to_string(_keys ", " _keysString)
+    mcl_string(JOIN ${_keys} ", " _keysString)
 
     mcl_map(CONTAINS ${map} ${key} _hasKey)
     EXPECT_TRUE(_hasKey "Expected map '${map}' to contain key (${key}) but it "
@@ -24,7 +24,7 @@ endmacro()
 
 macro(EXPECT_MAP_NOT_CONTAIN map key)
     mcl_map(KEYS ${map} _keys)
-    mcl_list_to_string(_keys ", " _keysString)
+    mcl_string(JOIN ${_keys} ", " _keysString)
 
     mcl_map(CONTAINS ${map} ${key} _hasKey)
     EXPECT_FALSE(_hasKey "Expected map '${map}' to not contain key (${key}) "

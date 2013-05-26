@@ -10,6 +10,9 @@
 # See the License for more information.
 #=============================================================================
 
+include(mcl/string)
+
+
 macro(_mcl_cmakeTest_checkFailed)
     set(_mcl_cmakeTest_currentCheckPassed FALSE)
     set(_mcl_cmakeTest_currentTestPassed NO CACHE INTERNAL "")
@@ -98,17 +101,17 @@ macro(_mcl_cmakeTest_startTestScript)
 endmacro()
 
 macro(_mcl_cmakeTest_endTestScript)
-    mcl_number_match(${_mcl_cmakeTest_ranTestCount} test tests __test_s)
+    mcl_string(FOR_NUMBER ${_mcl_cmakeTest_ranTestCount} test tests __test_s)
     message(STATUS "Ran ${_mcl_cmakeTest_ranTestCount} ${__test_s}")
 
     if (_mcl_cmakeTest_passedTestCount GREATER 0)
-        mcl_number_match(${_mcl_cmakeTest_passedTestCount} test tests __test_s)
+        mcl_string(FOR_NUMBER ${_mcl_cmakeTest_passedTestCount} test tests __test_s)
         message(STATUS "${_mcl_cmakeTest_passedTestCount} ${__test_s} Passed")
     endif()
 
     list(LENGTH _mcl_cmakeTest_failedTests __failedTestCount)
     if (__failedTestCount GREATER 0)
-        mcl_number_match(${__failedTestCount} test tests __test_s)
+        mcl_string(FOR_NUMBER ${__failedTestCount} test tests __test_s)
         message(STATUS "${__failedTestCount} ${__test_s} FAILED, listed below")
         foreach(_mcl_cmakeTest_failedTest ${_mcl_cmakeTest_failedTests})
             message(STATUS "    ${_mcl_cmakeTest_failedTest}")

@@ -1,4 +1,6 @@
 * The Missing CMake Library
+[[https://travis-ci.org/j3lamp/mcl.png?branch=master#.png]]
+
 A collection of useful cmake functions, macros, and utilities.
 
 ** Here be Dragons!

@@ -10,6 +10,9 @@
 # See the License for more information.
 #=============================================================================
 
+include(mcl/string)
+
+
 #!
 # Usage: EXPECT_TRUE(<variable> <message>...)
 #
@@ -113,7 +116,7 @@ macro(EXPECT_THAT)
 
     list(REMOVE_AT __arguments 0 -1)
     set(__condition ${__arguments})
-    mcl_list_to_string(__condition " " __conditionString)
+    mcl_string(JOIN ${__condition} " " __conditionString)
 
     set(__conditionInverted FALSE)
     list(GET __condition 0 __condition0)
@@ -204,7 +207,7 @@ macro(EXPECT_LIST)
 
     list(REMOVE_AT __arguments 0 -1)
     set(__condition ${__arguments})
-    mcl_list_to_string(__condition " " __conditionString)
+    mcl_string(JOIN ${__condition} " " __conditionString)
 
     set(__conditionInverted FALSE)
     list(GET __condition 0 __condition0)
@@ -222,8 +225,8 @@ macro(EXPECT_LIST)
                           "list expectations and assertions")
     endif()
 
-    mcl_list_to_string(${__actual}   ", " __actualString)
-    mcl_list_to_string(${__expected} ", " __expectedString)
+    mcl_string(JOIN ${${__actual}}   ", " __actualString)
+    mcl_string(JOIN ${${__expected}} ", " __expectedString)
     set(__message "Expected list '${__actual}' to ${__conditionString}")
     set(__message "${__message} (${__expectedString}) but was")
     set(__message "${__message} (${__actualString}).")
