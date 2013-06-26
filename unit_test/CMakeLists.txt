@@ -10,5 +10,6 @@
 # See the License for more information.
 #=============================================================================
 
+mcl_add_cmake_test_script(argParseTest.cmake)
 mcl_add_cmake_test_script(mapTest.cmake)
 mcl_add_cmake_test_script(stringTest.cmake)
