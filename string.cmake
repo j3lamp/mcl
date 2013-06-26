@@ -19,6 +19,7 @@
 #
 #  FOR_NUMBER will set <variable> to either <singular> or <plural> as
 #             appropriate based on the value of <number>.
+#
 function(mcl_string operation)
     if (operation STREQUAL "JOIN")
         _mcl_string_join(${ARGN})

@@ -10,8 +10,6 @@
 # See the License for more information.
 #=============================================================================
 
-include(mcl/uncategorized)      # @fixme
-
 
 set(_mcl_testing_base_path ${CMAKE_CURRENT_LIST_DIR})
 

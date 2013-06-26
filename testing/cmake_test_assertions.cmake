@@ -11,6 +11,7 @@
 #=============================================================================
 
 include(mcl/string)
+include(mcl/uncategorized)
 
 
 #!
@@ -21,7 +22,7 @@ include(mcl/string)
 #  and the current test will be marked as a failure, but continues.
 #
 #  variable   - the variable to be tested
-#  message... - the message to be printed if the variable is not true, the
+#  message    - the message to be printed if the variable is not true, the
 #               message will be formatted by the message() command.
 #
 macro(EXPECT_TRUE variable)
@@ -39,7 +40,7 @@ endmacro()
 #  and the current test will be marked as a failure and aborted.
 #
 #  variable   - the variable to be tested
-#  message... - the message to be printed if the variable is not true, the
+#  message    - the message to be printed if the variable is not true, the
 #               message will be formatted by the message() command.
 #
 macro(ASSERT_TRUE variable)
@@ -58,7 +59,7 @@ endmacro()
 #  and the current test will be marked as a failure, but continues.
 #
 #  variable   - the variable to be tested
-#  message... - the message to be printed if the variable is not false, the
+#  message    - the message to be printed if the variable is not false, the
 #               message will be formatted by the message() command.
 #
 macro(EXPECT_FALSE variable)
@@ -76,7 +77,7 @@ endmacro()
 #  a backtrace and the current test will be marked as a failure and aborted.
 #
 #  variable   - the variable to be tested
-#  message... - the message to be printed if the variable is not false, the
+#  message    - the message to be printed if the variable is not false, the
 #               message will be formatted by the message() command.
 #
 macro(ASSERT_FALSE variable)
@@ -182,8 +183,8 @@ endmacro()
 #  backtrace are printed. The test is also marked as a failure, but continues.
 #
 #  actualListVariable   - the name of the variable containing the actual list to
-#                          be tested, this should be a list produced by the code
-#                          under test.
+#                         be tested, this should be a list produced by the code
+#                         under test.
 #  'NOT'                - invert the condition used for the comparison
 #  CONDITION            - the condition to be used when comparing the actual
 #                         value against the expected value, see below
@@ -191,7 +192,7 @@ endmacro()
 #                         which the actual list is to be compared
 #
 #  Conditions:
-#    EQUAL.........- both lists contain the same number of items and for each
+#    EQUAL         - both lists contain the same number of items and for each
 #                    item in the expexted list there is a corresponding equal
 #                    item in the actual list
 #    EQUAL_ORDERED - both lists contain the same number of items and each item
@@ -249,8 +250,8 @@ endmacro()
 #  backtrace are printed. The test is also marked as a failure and aborted.
 #
 #  actualListVariable   - the name of the variable containing the actual list to
-#                          be tested, this should be a list produced by the code
-#                          under test.
+#                         be tested, this should be a list produced by the code
+#                         under test.
 #  'NOT'                - invert the condition used for the comparison
 #  CONDITION            - the condition to be used when comparing the actual
 #                         value against the expected value, see below
