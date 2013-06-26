@@ -10,6 +10,12 @@
 # See the License for more information.
 #=============================================================================
 
+#! @todo optional and repeated argument groups
+#        "... [FLAG <list>...] ..."
+#        "... [FLAG <list>...]... ..."
+#        "... (FLAG <var> <var2>)... ..."
+#! @todo multiple argument specifications for functions like mcl_map()
+
 #!
 # mcl_parseArguments(<name> <prefix> <specification>... ARGN <arg>...)
 function(mcl_parseArguments functionName prefix)
@@ -33,17 +39,6 @@ function(mcl_parseArguments functionName prefix)
                             "argument before the argument list to be parsed. "
                             "Usage: ${this_usage}")
     endif()
-
-    # <debug>
-    message("Specifications:")
-    foreach(spec ${specifications})
-        message("    ${spec}")
-    endforeach()
-    message("Arguments:")
-    foreach(arg ${arguments})
-        message("    ${arg}")
-    endforeach()
-    # </debug>
 
     _mcl_argParse_getSpecification()
     set(usage "Usage: ${functionName}(${specification})")
@@ -85,6 +80,9 @@ macro(_mcl_argParse_appendSpecData name type optional)
 
     list(LENGTH specNames specCount)
     math(EXPR specMaxIndex "${specCount} - 1")
+    if (${optional} STREQUAL "REQUIRED")
+        math(EXPR specRequiredCount "${specRequiredCount} + 1")
+    endif()
 endmacro()
 
 macro(_mcl_argParse_removeSpecDataAt index)
@@ -129,6 +127,7 @@ macro(_mcl_argParse_parseSpecification)
 
     set(specNames)
     set(specTypes)
+    set(specRequiredCount 0)
 
     string(REPLACE " " ";" specificationParts ${specification})
     foreach(specPart ${specificationParts})
@@ -151,9 +150,6 @@ macro(_mcl_argParse_parseSpecification)
             _mcl_argParse_appendSpecData(${prefix}${specPart} "flag" ${optional})
         endif()
     endforeach()
-
-    message("specNames: ${specNames}")
-    message("specTypes: ${specTypes}")
 endmacro()
 
 macro(_mcl_argParse_initializeVariables)
@@ -173,27 +169,22 @@ endmacro()
 
 macro(_mcl_argParse_parseArguments)
     list(LENGTH arguments argumentCount)
-    set(parseDirection BACKWARDS)
-    set(index ${specMaxIndex})
-    while (index         GREATER -1           AND
-           index         LESS    ${specCount} AND
-           specCount     GREATER 0            AND
+    math(EXPR optionalArgumentCount "${argumentCount} - ${specRequiredCount}")
+    set(index 0)
+    while (index         LESS    ${specCount} AND
            argumentCount GREATER 0)
         math(EXPR nextIndex "${index} + 1")
 
         _mcl_argParse_getSpecData(${index})
         _mcl_argParse_getSpecData(${nextIndex} next_)
         set(specCompleted TRUE)
-        if (parseDirection STREQUAL BACKWARDS)
-            list(GET arguments -1 arg)
-        else()
-            list(GET arguments 0 arg)
-        endif()
+        list(GET arguments 0 arg)
         set(consumeArgument TRUE)
 
         if (${optional}                     AND
-            ${next_type}    STREQUAL "flag" AND
-            ${prefix}${arg} STREQUAL "${next_name}")
+            ((NOT ${optionalArgumentCount} GREATER 0) OR
+             (${next_type}    STREQUAL "flag" AND
+              ${prefix}${arg} STREQUAL "${next_name}")))
             # our current spec is optional and the current argument matches the
             # following flag spec, so we want to skip the current spec
             set(type "SKIP")
@@ -202,21 +193,10 @@ macro(_mcl_argParse_parseArguments)
         if (type STREQUAL "variable")
             set(${name} ${arg})
         elseif (type STREQUAL "list")
-            if (parseDirection STREQUAL BACKWARDS)
-                # once we hit a list going backwards we need to parse forwards
-                # from the beginning, then the list will be last and the
-                # arguments will be parsed correctly
-                set(parseDirection FORWARDS)
-                set(index 0)
+            list(APPEND ${name} ${arg})
 
-                set(consumeArgument FALSE)
-                set(specCompleted   FALSE)
-            else()
-                list(APPEND ${name} ${arg})
-
-                set(specCompleted FALSE)
-                _mcl_argParse_makeSpecOptional(${index})
-            endif()
+            set(specCompleted FALSE)
+            _mcl_argParse_makeSpecOptional(${index})
         elseif (type STREQUAL "flag")
             if (${prefix}${arg} STREQUAL ${name})
                 set(${name} TRUE)
@@ -235,26 +215,17 @@ macro(_mcl_argParse_parseArguments)
         endif()
 
         if (consumeArgument)
-            if (parseDirection STREQUAL BACKWARDS)
-                list(REMOVE_AT arguments -1)
-            else()
-                list(REMOVE_AT arguments 0)
-            endif()
+            list(REMOVE_AT arguments 0)
             list(LENGTH arguments argumentCount)
+            if (${optional})
+                math(EXPR optionalArgumentCount "${optionalArgumentCount} - 1")
+            endif()
         endif()
         if (specCompleted)
-            if (parseDirection STREQUAL BACKWARDS)
-                _mcl_argParse_removeSpecDataAt(${index})
-                set(index ${specMaxIndex})
-            else()
-                math(EXPR index "${index} + 1")
-            endif()
+            math(EXPR index "${index} + 1")
         endif()
     endwhile()
 
-    if (parseDirection STREQUAL BACKWARDS)
-        set(index 0)            # we want to be going forwards now
-    endif()
     while (index LESS ${specCount})
          _mcl_argParse_getSpecData(${index})
          if (optional)

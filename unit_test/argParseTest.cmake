@@ -126,11 +126,25 @@ test(parseArgumentsTest variableThenOptionalList_noListArguments_listEmpty)
     EXPECT_LIST(op_list EQUAL_ORDERED empty)
 endtest()
 
-test(parseArgumentsTest variableThenOptionalList_manyListArguments_listEmpty)
+test(parseArgumentsTest variableThenOptionalList_manyListArguments_listFull)
     mcl_parseArguments(test14 op_ "<arg> [<list>...]" ARGN ${val1} ${cheese})
 
     EXPECT_THAT(op_arg EQUAL val1)
     EXPECT_LIST(op_list EQUAL_ORDERED cheese)
+endtest()
+
+test(parseArgumentsTest optionalListThenVariable_oneArgument_listEmpty)
+    mcl_parseArguments(test19 op_ "[<list>...] <arg>" ARGN ${val1})
+
+    EXPECT_LIST(op_list EQUAL_ORDERED empty)
+    EXPECT_THAT(op_arg EQUAL val1)
+endtest()
+
+test(parseArgumentsTest optionalListThenVariable_manyArguments_listFull)
+    mcl_parseArguments(test20 op_ "[<list>...] <arg>" ARGN ${fish} ${val1})
+
+    EXPECT_LIST(op_list EQUAL_ORDERED fish)
+    EXPECT_THAT(op_arg EQUAL val1)
 endtest()
 
 
@@ -138,7 +152,26 @@ test(parseArgumentsTest varThenOptVar_noSecondVar_firstSetSecondEmpty)
     mcl_parseArguments(test15 op_ "<arg1> [<arg2>]" ARGN ${val1})
 
     EXPECT_THAT(op_arg1 EQUAL val1)
-    EXPECT_THAT(op_arg2 STREQAL empty)
+    EXPECT_THAT(op_arg2 STREQUAL empty)
 endtest()
 
-#! @todo more tests required for optional variables
+test(parseArgumentsTest varThenOptVar_hasSecondVar_firstSetSecondEmpty)
+    mcl_parseArguments(test16 op_ "<arg1> [<arg2>]" ARGN ${val1} ${val2})
+
+    EXPECT_THAT(op_arg1 EQUAL val1)
+    EXPECT_THAT(op_arg2 STREQUAL val2)
+endtest()
+
+test(parseArgumentsTest optVarThenVar_onlyOneArg_firstEmptySecondSet)
+    mcl_parseArguments(test17 op_ "[<arg0>] <arg1>" ARGN ${val2})
+
+    EXPECT_THAT(op_arg0 STREQUAL empty)
+    EXPECT_THAT(op_arg1 STREQUAL val2)
+endtest()
+
+test(parseArgumentsTest optVarThenVar_twoArgs_firstEmptySecondSet)
+    mcl_parseArguments(test18 op_ "[<arg0>] <arg1>" ARGN ${val1} ${val2})
+
+    EXPECT_THAT(op_arg0 EQUAL val1)
+    EXPECT_THAT(op_arg1 STREQUAL val2)
+endtest()

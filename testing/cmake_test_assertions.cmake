@@ -126,7 +126,7 @@ macro(EXPECT_THAT)
         set(__conditionInverted TRUE)
     endif()
 
-    if (${__actual} ${__condition} ${__expected})
+    if ("${${__actual}}" ${__condition} "${${__expected}}")
         set(__checkPassed YES)
     else()
         set(__checkPassed NO)
