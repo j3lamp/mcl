@@ -17,7 +17,65 @@
 #! @todo multiple argument specifications for functions like mcl_map()
 
 #!
-# mcl_parseArguments(<name> <prefix> <specification>... ARGN <arg>...)
+# mcl_parseArguments(<name> <prefix> <specification> ARGN <args>...)
+#
+#  Parse the arguments passed to a function. This should only be used when the
+#  in-built parsing provided by CMake isn't sufficient. Argument parsing can get
+#  rather complex whenever optional paramters are involved, especially if they
+#  are not at the end of the argument list.
+#
+#  name          - the name of the function whose arguments are being parsed,
+#                  this is used when printing error messages if <args> are
+#                  invalid
+#  prefix        - a variable is set for each parameter listed in
+#                  <specification>, all are prefixed by this to avoid name
+#                  collisions
+#  specification - a string describing the parameters expected by the calling
+#                  function
+#  args          - the arguments provided to the calling function, usually just
+#                  ${ARGN}
+#
+#  Specifications:
+#    Specifications are strings that describe the parameters expected by a
+#    function. They are a small description language of their own. This language
+#    was designed to use common conventions already used for describing
+#    parameters as might be seen in documentation comments or man
+#    pages. Parameters are separated by spaces and use certain symbols to
+#    describe what kind they are.
+#
+#    <variable> - A single parameter that whose name is inside the angle
+#                 brackets. This argument can have any value.
+#    FLAG       - A single literal parameter whose name is the same as its
+#                 specification. These are typically written in UPPER_SCORE, but
+#                 they needn't be. The argument is expected to be the parameter
+#                 name exactly. The value returned will be either TRUE or FALSE.
+#    <list>...  - Like a variable this parameter's name is inside the angle
+#                 brackets. It accepts one or more arguments. Only one argument
+#                 is required to satisfy this type of parameter, additional
+#                 values are optional.
+#    [optional] - An optional parameter is, of course, one that needn't be
+#                 present in the argument list. Unlike the others inside the
+#                 square brackets is a parameter specification. It could be a
+#                 variable, flag, or list. NOTE: only one parameter can be
+#                 inside the square brackets.
+#
+#    Optional parameters, including additional list values, are included from
+#    left to right. List parsing consumes all available arguments until there
+#    are no extra arguments left or an argument matching a flag parameter
+#    immediately following the list parameter is found. Please keep in mind that
+#    some parameter specifications are ambiguous and may not behave as
+#    desired. For example a list followed by an optional variable,
+#    "<list>... [<variable>]", will result in the variable parameter never being
+#    assigned a value. A similar situation occurs with two lists,
+#    "<list1>... <list2>...", where list2 will never have more than 1 value.
+#
+#  Specification Examples:
+#    These examples are taken from current MCL functions to, hopefully, make
+#    them easier to understand.
+#
+#    mcl_map():    "SET <map> <key> <value>... [GLOBAL]"
+#    mcl_string(): "JOIN <value>... <separator> <variable>"
+#
 function(mcl_parseArguments functionName prefix)
     set(this_usage "mcl_parseArguments(<name> <prefix> <specification>... ARGN <arg>...)")
 

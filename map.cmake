@@ -14,7 +14,7 @@
 # Usage: mcl_map(<operation> <map> [arguments])
 #
 # Operations:
-#   SET <map> <key> <value> [<value>...] [GLOBAL]
+#   SET <map> <key> <value>... [GLOBAL]
 #     Set a list of values for <key> in <map>. If GLOBAL then the map is stored
 #     as a global variable.
 #
@@ -22,11 +22,11 @@
 #     Set <variable> to the value associated iwth <key> in map <map>.
 #
 #   MAKE <map> GLOBAL
-#     Change the map <map> to be stored as a global varialbe. That is put it in
+#     Change the map <map> to be stored as a global variable. That is put it in
 #     the cache as an internal variable.
 #
 #   KEYS <map> <variable>
-#     Set <varaible> to the list of keys in map <map>.
+#     Set <variable> to the list of keys in map <map>.
 #
 #   CONTAINS <map> <key> <variable>
 #      Set <variable> to TRUE if ket <key> is in map <map>, otherwise it is set
@@ -65,7 +65,7 @@ function(mcl_map operation map thirdArg)
             endif()
         else()
             message(FATAL_ERROR "Invalid map operation: MAKE <map> GLOBAL is"
-                                "the only valid option for the MAKE opertaion")
+                                "the only valid option for the MAKE operation")
         endif()
 
     elseif (operation STREQUAL "KEYS")
@@ -100,7 +100,7 @@ endfunction()
 
 
 macro(_mcl_map_set map key keyList keyVar)
-    set(_arguments ${ARGN}) # we need to manipulate this list
+    set(_arguments ${ARGN})     # we need to manipulate this list
     set(_tempKeys ${${keyList}})
 
     _mcl_map_in_cache(_global ${keyList})
