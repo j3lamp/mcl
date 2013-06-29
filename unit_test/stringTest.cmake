@@ -13,7 +13,7 @@
 include(mcl/string)
 
 
-test(stringTest join_oneValue_setsOriginal)
+test(join oneValue_setsOriginal)
     set(original "some value")
 
     mcl_string(JOIN ${original} ", " actual)
@@ -21,7 +21,7 @@ test(stringTest join_oneValue_setsOriginal)
     EXPECT_THAT(actual STREQUAL original)
 endtest()
 
-test(stringTest join_twoValues_yieldsStringWithSeparator)
+test(join twoValues_yieldsStringWithSeparator)
     set(expected "one fish, two fish")
 
     mcl_string(JOIN "one fish" "two fish" ", " actual)
@@ -29,7 +29,7 @@ test(stringTest join_twoValues_yieldsStringWithSeparator)
     EXPECT_THAT(actual STREQUAL expected)
 endtest()
 
-test(stringTest join_manyValues_yieldsStringWithManySeparators)
+test(join manyValues_yieldsStringWithManySeparators)
     set(expected "one fish, two fish, red fish, blue fish")
 
     mcl_string(JOIN "one fish" "two fish" "red fish" "blue fish" ", " actual)
@@ -37,7 +37,7 @@ test(stringTest join_manyValues_yieldsStringWithManySeparators)
     EXPECT_THAT(actual STREQUAL expected)
 endtest()
 
-test(stringTest join_valuesFromList_yieldsExpectedSeparatedString)
+test(join valuesFromList_yieldsExpectedSeparatedString)
     set(expected "one fish, two fish, red fish, blue fish")
 
     set(values "one fish" "two fish" "red fish" "blue fish")
@@ -47,7 +47,7 @@ test(stringTest join_valuesFromList_yieldsExpectedSeparatedString)
     EXPECT_THAT(actual STREQUAL expected)
 endtest()
 
-test(stringTest join_manySeparators_yeailsStringsWithCorrectSeparators)
+test(join manySeparators_yeailsStringsWithCorrectSeparators)
     set(expected1 "one, two, three")
     set(expected2 "one-two-three")
     set(expected3 "one then two then three")
@@ -64,7 +64,7 @@ test(stringTest join_manySeparators_yeailsStringsWithCorrectSeparators)
 endtest()
 
 
-test(stringTest for_number_one_yieldsSingular)
+test(for_number one_yieldsSingular)
     set(expected thing)
 
     mcl_string(FOR_NUMBER 1 thing things actual)
@@ -72,7 +72,7 @@ test(stringTest for_number_one_yieldsSingular)
     EXPECT_THAT(actual STREQUAL expected)
 endtest()
 
-test(stringTest for_number_negativeOne_yieldsSingular)
+test(for_number negativeOne_yieldsSingular)
     set(expected thing)
 
     mcl_string(FOR_NUMBER -1 thing things actual)
@@ -80,7 +80,7 @@ test(stringTest for_number_negativeOne_yieldsSingular)
     EXPECT_THAT(actual STREQUAL expected)
 endtest()
 
-test(stringTest for_number_zero_yieldsPlural)
+test(for_number zero_yieldsPlural)
     set(expected dollars)
 
     mcl_string(FOR_NUMBER 0 dollar dollars actual)
@@ -88,7 +88,7 @@ test(stringTest for_number_zero_yieldsPlural)
     EXPECT_THAT(actual STREQUAL expected)
 endtest()
 
-test(stringTest for_number_largeNumbers_yieldPlural)
+test(for_number largeNumbers_yieldPlural)
     set(expected data)
 
     mcl_string(FOR_NUMBER 2    datum data actual1)
@@ -102,7 +102,7 @@ test(stringTest for_number_largeNumbers_yieldPlural)
     EXPECT_THAT(actual4 STREQUAL expected)
 endtest()
 
-test(stringTest for_number_largeNegativeNumbers_yieldPlural)
+test(for_number largeNegativeNumbers_yieldPlural)
     set(expected earnings)
 
     mcl_string(FOR_NUMBER -2     earning earnings actual1)
@@ -116,7 +116,7 @@ test(stringTest for_number_largeNegativeNumbers_yieldPlural)
     EXPECT_THAT(actual4 STREQUAL expected)
 endtest()
 
-test(stringTest for_number_decimalNumbers_yieldPlural)
+test(for_number decimalNumbers_yieldPlural)
     set(expected "inches")
 
     mcl_string(FOR_NUMBER -0.3          inch inches actual1)

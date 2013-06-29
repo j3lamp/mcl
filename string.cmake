@@ -10,52 +10,49 @@
 # See the License for more information.
 #=============================================================================
 
+include(mcl/parse_arguments)
+
+
 #!
-# Usage: mcl_string(JOIN <value>... <separator> <variable>)
+# Usage: mcl_string(JOIN [<values>...] <separator> <variable>)
 #        mcl_string(FOR_NUMBER <number> <singular> <plural> <variable>)
 #
 #  JOIN will concatenate all of the <values> with <separator> and store the
-#       result in <variable>.
+#       result in <variable>. If there are no <values> provided <variable> is
+#       set to an empty string.
 #
 #  FOR_NUMBER will set <variable> to either <singular> or <plural> as
 #             appropriate based on the value of <number>.
 #
-function(mcl_string operation)
-    if (operation STREQUAL "JOIN")
-        _mcl_string_join(${ARGN})
-    elseif (operation STREQUAL "FOR_NUMBER")
-        _mcl_string_for_number(${ARGN})
-    else()
-        message(FATAL_ERROR "Invalid MCL string operation '${operation}'. "
-                            "Valid operations are: JOIN and FOR_NUMBER")
+function(mcl_string)
+    mcl_parse_arguments(mcl_string mcls_
+                        "JOIN [<values>...] <separator> <variable>"
+                        "FOR_NUMBER <number> <singular> <plural> <variable>"
+                        ARGN ${ARGN})
+
+    if (mcls_JOIN)
+        _mcl_string_join()
+    elseif (mcls_FOR_NUMBER)
+        _mcl_string_for_number(${mcls_number}
+                               ${mcls_singular} ${mcls_plural}
+                               ${mcls_variable})
     endif()
 endfunction()
 
 
 macro(_mcl_string_join)
-    if (ARGC LESS 3)
-        message(FATAL_ERROR "mcl_string(JOIN) requires at least 3 arguments. "
-                            "Usage: mcl_string(JOIN <value>... <separator> "
-                            "<variable>)")
-    endif()
-
-    set(arguments ${ARGN})
-    list(GET arguments -1 variable)
-    list(GET arguments -2 separator)
-    list(REMOVE_AT arguments -1 -2)
-
     set(output)
     set(first TRUE)
-    foreach(entry ${arguments})
+    foreach(entry ${mcls_values})
         if (first)
             set(first FALSE)
         else()
-            set(output "${output}${separator}")
+            set(output "${output}${mcls_separator}")
         endif()
         set(output "${output}${entry}")
     endforeach()
 
-    set(${variable} ${output} PARENT_SCOPE)
+    set(${mcls_variable} ${output} PARENT_SCOPE)
 endmacro()
 
 macro(_mcl_string_for_number number singular plural variable)
