@@ -17,7 +17,7 @@
 #! @todo more examples probably wouldn't hurt
 
 #!
-# mcl_parseArguments(<name> <prefix> <specifications>... ARGN <args>...)
+# mcl_parse_arguments(<name> <prefix> <specifications>... ARGN <args>...)
 #
 #  Parse the arguments passed to a function. This should only be used when the
 #  in-built parsing provided by CMake isn't sufficient. Argument parsing can get
@@ -106,8 +106,8 @@
 #      "FOR_NUMBER":  2
 #      anything else: 2
 #
-function(mcl_parseArguments functionName prefix)
-    set(this_usage "mcl_parseArguments(<name> <prefix> <specification>... ARGN <arg>...)")
+function(mcl_parse_arguments functionName prefix)
+    set(this_usage "mcl_parse_arguments(<name> <prefix> <specification>... ARGN <arg>...)")
 
     list(APPEND specifications)
     list(APPEND arguments)
@@ -123,25 +123,25 @@ function(mcl_parseArguments functionName prefix)
         endif()
     endforeach()
     if (NOT haveArgn)
-        message(FATAL_ERROR "mcl_parseArguments requires the 'ARGN' flag "
+        message(FATAL_ERROR "mcl_parse_arguments requires the 'ARGN' flag "
                             "argument before the argument list to be parsed. "
                             "Usage: ${this_usage}")
     endif()
 
-    _mcl_argParse_getSpecification()
+    _mcl_parse_arguments_getSpecification()
     set(usage "Usage: ${functionName}(${specification})")
-    _mcl_argParse_parseSpecification()
+    _mcl_parse_arguments_parseSpecification()
 
-    _mcl_argParse_initializeVariables()
-    _mcl_argParse_parseArguments()
-    _mcl_argParse_storeVariables()
+    _mcl_parse_arguments_initializeVariables()
+    _mcl_parse_arguments_parseArguments()
+    _mcl_parse_arguments_storeVariables()
 endfunction()
 
 
-macro(_mcl_argParse_getSpecification)
+macro(_mcl_parse_arguments_getSpecification)
     list(LENGTH specifications specificationCount)
     if (specificationCount EQUAL 0)
-        message(FATAL_ERROR "mcl_parseArguments was called without any argument "
+        message(FATAL_ERROR "mcl_parse_arguments was called without any argument "
                             "specifications. Proper usage: "
                             ${this_usage})
     elseif (specificationCount EQUAL 1)
@@ -168,7 +168,7 @@ macro(_mcl_argParse_getSpecification)
             foreach (specIndex RANGE ${specificationMaxIndex})
                 list(GET specifications ${specIndex} specification)
 
-                _mcl_argParse_getPrefixesFromSpec()
+                _mcl_parse_arguments_getPrefixesFromSpec()
             endforeach()
 
             foreach (specificationPrefix ${specificationPrefixes})
@@ -199,7 +199,7 @@ macro(_mcl_argParse_getSpecification)
     endif()
 endmacro()
 
-macro(_mcl_argParse_appendSpecData name type optional)
+macro(_mcl_parse_arguments_appendSpecData name type optional)
     list(APPEND allSpecNames ${name})
 
     list(APPEND specNames     ${name})
@@ -219,7 +219,7 @@ macro(_mcl_argParse_appendSpecData name type optional)
     endif()
 endmacro()
 
-macro(_mcl_argParse_removeSpecDataAt index)
+macro(_mcl_parse_arguments_removeSpecDataAt index)
     foreach (_list Names Types Optionals)
         list(REMOVE_AT spec${_list} ${index})
     endforeach()
@@ -228,7 +228,7 @@ macro(_mcl_argParse_removeSpecDataAt index)
     math(EXPR specMaxIndex "${specCount} - 1")
 endmacro()
 
-macro(_mcl_argParse_makeSpecOptional index)
+macro(_mcl_parse_arguments_makeSpecOptional index)
     list(REMOVE_AT specOptionals ${index})
     if (${index} EQUAL specMaxIndex)
         list(APPEND specOptionals TRUE)
@@ -237,7 +237,7 @@ macro(_mcl_argParse_makeSpecOptional index)
     endif()
 endmacro()
 
-macro(_mcl_argParse_getSpecData index)
+macro(_mcl_parse_arguments_getSpecData index)
     if (${ARGC} EQUAL 2)
         set(_dataPrefix ${ARGV1})
     else()
@@ -254,7 +254,7 @@ macro(_mcl_argParse_getSpecData index)
     endif()
 endmacro()
 
-macro(_mcl_argParse_parseSpecification)
+macro(_mcl_parse_arguments_parseSpecification)
     set(_optionalRE "^\\[(.+)\\]$")
     set(_variableRE "^<(.+)>$")
     set(_listRE     "^<(.+)>...$")
@@ -276,20 +276,20 @@ macro(_mcl_argParse_parseSpecification)
         if (${specPart} MATCHES ${_variableRE})
             string(REGEX REPLACE ${_variableRE} "\\1" name ${specPart})
 
-            _mcl_argParse_appendSpecData(${prefix}${name} "variable" ${optional})
+            _mcl_parse_arguments_appendSpecData(${prefix}${name} "variable" ${optional})
         elseif (${specPart} MATCHES ${_listRE})
             string(REGEX REPLACE ${_listRE} "\\1" name ${specPart})
 
-            _mcl_argParse_appendSpecData(${prefix}${name} "list" ${optional})
+            _mcl_parse_arguments_appendSpecData(${prefix}${name} "list" ${optional})
         else()
-            _mcl_argParse_appendSpecData(${prefix}${specPart} "flag" ${optional})
+            _mcl_parse_arguments_appendSpecData(${prefix}${specPart} "flag" ${optional})
         endif()
     endforeach()
 endmacro()
 
-macro(_mcl_argParse_initializeVariables)
+macro(_mcl_parse_arguments_initializeVariables)
     foreach(index RANGE ${specMaxIndex})
-        _mcl_argParse_getSpecData(${index})
+        _mcl_parse_arguments_getSpecData(${index})
 
         if (type STREQUAL "variable" OR
             type STREQUAL "list")
@@ -302,7 +302,7 @@ macro(_mcl_argParse_initializeVariables)
     endforeach()
 endmacro()
 
-macro(_mcl_argParse_parseArguments)
+macro(_mcl_parse_arguments_parseArguments)
     list(LENGTH arguments argumentCount)
     math(EXPR optionalArgumentCount "${argumentCount} - ${specRequiredCount}")
     set(index 0)
@@ -310,8 +310,8 @@ macro(_mcl_argParse_parseArguments)
            argumentCount GREATER 0)
         math(EXPR nextIndex "${index} + 1")
 
-        _mcl_argParse_getSpecData(${index})
-        _mcl_argParse_getSpecData(${nextIndex} next_)
+        _mcl_parse_arguments_getSpecData(${index})
+        _mcl_parse_arguments_getSpecData(${nextIndex} next_)
         set(specCompleted TRUE)
         list(GET arguments 0 arg)
         set(consumeArgument TRUE)
@@ -331,7 +331,7 @@ macro(_mcl_argParse_parseArguments)
             list(APPEND ${name} ${arg})
 
             set(specCompleted FALSE)
-            _mcl_argParse_makeSpecOptional(${index})
+            _mcl_parse_arguments_makeSpecOptional(${index})
         elseif (type STREQUAL "flag")
             if (${prefix}${arg} STREQUAL ${name})
                 set(${name} TRUE)
@@ -362,7 +362,7 @@ macro(_mcl_argParse_parseArguments)
     endwhile()
 
     while (index LESS ${specCount})
-         _mcl_argParse_getSpecData(${index})
+         _mcl_parse_arguments_getSpecData(${index})
          if (optional)
             math(EXPR index "${index} + 1")
         else()
@@ -379,19 +379,19 @@ macro(_mcl_argParse_parseArguments)
     endif()
 endmacro()
 
-macro(_mcl_argParse_storeVariables)
+macro(_mcl_parse_arguments_storeVariables)
     foreach(name ${allSpecNames})
         set(${name} ${${name}} PARENT_SCOPE)
     endforeach()
 endmacro()
 
 
-macro(_mcl_argParse_getPrefixesFromSpec)
-    _mcl_argParse_parseSpecification()
+macro(_mcl_parse_arguments_getPrefixesFromSpec)
+    _mcl_parse_arguments_parseSpecification()
 
     set(canBeDefault FALSE)
     foreach(index RANGE ${specMaxIndex})
-        _mcl_argParse_getSpecData(${index})
+        _mcl_parse_arguments_getSpecData(${index})
 
         if (type STREQUAL "variable" OR
             type STREQUAL "list")
@@ -411,7 +411,7 @@ macro(_mcl_argParse_getPrefixesFromSpec)
     if (canBeDefault)
         if (NOT specificationDefault EQUAL -1)
             message(FATAL_ERROR "When passing multiple specifications to "
-                                "mcl_parseArguments() there can only be one "
+                                "mcl_parse_arguments() there can only be one "
                                 "that does not begin with a required flag "
                                 "parameter.")
         endif()
