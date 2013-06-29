@@ -14,10 +14,10 @@
 #        "... [FLAG <list>...] ..."
 #        "... [FLAG <list>...]... ..."
 #        "... (FLAG <var> <var2>)... ..."
-#! @todo multiple argument specifications for functions like mcl_map()
+#! @todo more examples probably wouldn't hurt
 
 #!
-# mcl_parseArguments(<name> <prefix> <specification> ARGN <args>...)
+# mcl_parseArguments(<name> <prefix> <specifications>... ARGN <args>...)
 #
 #  Parse the arguments passed to a function. This should only be used when the
 #  in-built parsing provided by CMake isn't sufficient. Argument parsing can get
@@ -69,12 +69,42 @@
 #    assigned a value. A similar situation occurs with two lists,
 #    "<list1>... <list2>...", where list2 will never have more than 1 value.
 #
+#  Multiple Specifications:
+#    If multiple specifications are provided the first item in <args> will be
+#    checked to determine which specification should be used for
+#    parsing. Because of this each specification must start with a unique
+#    required flag parameter. An argument specification can start with one or
+#    more optional flag parameters, however they must all be able unique to that
+#    specification. Additionally only one specification can start with a
+#    non-flag parameter. If the first argumetn does not match any of the flag
+#    parameters then the specification that starts with a non-flag parameter
+#    will be chosen, if one is provided.
+#
 #  Specification Examples:
 #    These examples are taken from current MCL functions to, hopefully, make
 #    them easier to understand.
 #
 #    mcl_map():    "SET <map> <key> <value>... [GLOBAL]"
 #    mcl_string(): "JOIN <value>... <separator> <variable>"
+#
+#  Multiple Specification Examples:
+#    These examples list several specifications, then which will be chosen for a
+#    given first argument.
+#
+#    mcl_string():
+#      1: "JOIN <value>... <separator> <variable>"
+#      2: "FOR_NUMBER <number> <singular> <plural> <variable>"
+#
+#      "JOIN":       1
+#      "FOR_NUMBER": 2
+#
+#    optional flag:
+#      1: "JOIN <value>... <separator> <variable>"
+#      2: "[FOR_NUMBER] <number> <singular> <plural> <variable>"
+#
+#      "JOIN":        1
+#      "FOR_NUMBER":  2
+#      anything else: 2
 #
 function(mcl_parseArguments functionName prefix)
     set(this_usage "mcl_parseArguments(<name> <prefix> <specification>... ARGN <arg>...)")
@@ -115,11 +145,57 @@ macro(_mcl_argParse_getSpecification)
                             "specifications. Proper usage: "
                             ${this_usage})
     elseif (specificationCount EQUAL 1)
-        # do stuff
         list(GET specifications 0 specification)
     else()
-        message(FATAL_ERROR "mcl_parseArguments does not yet support multiple "
-                            "specifications")
+        list(LENGTH arguments argumentCount)
+        set(matchedSpecification)
+
+        if (argumentCount GREATER 0)
+            set(specificationPrefixes)
+                # a list of flag parameters for matching against the first
+                # argument to determine which specification should be used
+            set(specificationPrefixIndices)
+                # a list of indices that match entries from the prefix list to
+                # their corresponding specification; because of optional
+                # parameters there can be more than one prefix per specification
+            set(specificationDefault  -1)
+                # if there is a prefix that begins with a variable or list
+                # (optionally, or required) it becomes the default specification
+                # if the first argument does not match any of the prefixes,
+                # there can only be *one* default specification
+
+            math(EXPR specificationMaxIndex "${specificationCount} - 1")
+            foreach (specIndex RANGE ${specificationMaxIndex})
+                list(GET specifications ${specIndex} specification)
+
+                _mcl_argParse_getPrefixesFromSpec()
+            endforeach()
+
+            foreach (specificationPrefix ${specificationPrefixes})
+                set(${specificationPrefix} FALSE PARENT_SCOPE)
+            endforeach()
+
+            list(GET arguments 0 firstArgument)
+            list(FIND specificationPrefixes ${prefix}${firstArgument} matchedIndex)
+            if (matchedIndex EQUAL -1)
+                set(matchedIndex ${specificationDefault})
+            endif()
+            if (NOT matchedIndex EQUAL -1)
+                list(GET specifications ${matchedIndex} matchedSpecification)
+            endif()
+        endif()
+
+        if (NOT matchedSpecification)
+            set(usages)
+            foreach(specification ${specifications})
+                list(APPEND usages "\n  ${functionName}(${specification})")
+            endforeach()
+            message(FATAL_ERROR
+                    "Incorrect arguments passed to ${functionName}()\n"
+                    "Usages:" ${usages})
+        endif()
+
+        set(specification ${matchedSpecification})
     endif()
 endmacro()
 
@@ -185,6 +261,7 @@ macro(_mcl_argParse_parseSpecification)
 
     set(specNames)
     set(specTypes)
+    set(specOptionals)
     set(specRequiredCount 0)
 
     string(REPLACE " " ";" specificationParts ${specification})
@@ -211,7 +288,7 @@ macro(_mcl_argParse_parseSpecification)
 endmacro()
 
 macro(_mcl_argParse_initializeVariables)
-    foreach(index RANGE specCount)
+    foreach(index RANGE ${specMaxIndex})
         _mcl_argParse_getSpecData(${index})
 
         if (type STREQUAL "variable" OR
@@ -306,4 +383,39 @@ macro(_mcl_argParse_storeVariables)
     foreach(name ${allSpecNames})
         set(${name} ${${name}} PARENT_SCOPE)
     endforeach()
+endmacro()
+
+
+macro(_mcl_argParse_getPrefixesFromSpec)
+    _mcl_argParse_parseSpecification()
+
+    set(canBeDefault FALSE)
+    foreach(index RANGE ${specMaxIndex})
+        _mcl_argParse_getSpecData(${index})
+
+        if (type STREQUAL "variable" OR
+            type STREQUAL "list")
+            set(canBeDefault TRUE)
+        elseif (type STREQUAL "flag")
+            list(APPEND specificationPrefixes      ${name})
+            list(APPEND specificationPrefixIndices ${specIndex})
+        else()
+            message(FATAL_ERROR "we should never get here")
+        endif()
+
+        if (NOT optional)
+            break()
+        endif()
+    endforeach()
+
+    if (canBeDefault)
+        if (NOT specificationDefault EQUAL -1)
+            message(FATAL_ERROR "When passing multiple specifications to "
+                                "mcl_parseArguments() there can only be one "
+                                "that does not begin with a required flag "
+                                "parameter.")
+        endif()
+
+        set(specificationDefault ${specIndex})
+    endif()
 endmacro()
