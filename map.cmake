@@ -46,8 +46,6 @@ function(mcl_map)
 
     set(keyList ${mclm_map}_Keys_)
     _mcl_map_key(keyVar ${mclm_map} "${mclm_key}")
-    message("keyVar: ${keyVar}")
-    message("value: ${${keyVar}}")
 
     if (mclm_SET)
         _mcl_map_set(${mclm_map} ${mclm_key} ${keyList} ${keyVar} ${mclm_GLOBAL} ${mclm_values})
