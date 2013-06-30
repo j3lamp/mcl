@@ -10,11 +10,14 @@
 # See the License for more information.
 #=============================================================================
 
+include(mcl/parse_arguments)
+
+
 #!
 # Usage: mcl_map(<operation> <map> [arguments])
 #
 # Operations:
-#   SET <map> <key> <value>... [GLOBAL]
+#   SET <map> <key> [<values>...] [GLOBAL]
 #     Set a list of values for <key> in <map>. If GLOBAL then the map is stored
 #     as a global variable.
 #
@@ -32,86 +35,57 @@
 #      Set <variable> to TRUE if ket <key> is in map <map>, otherwise it is set
 #      to FALSE.
 #
-function(mcl_map operation map thirdArg)
-    set(key      ${thirdArg})
-    set(state    ${thirdArg})
-    set(variable ${thirdArg})
+function(mcl_map)
+    mcl_parse_arguments(mcl_map mclm_
+                        "SET <map> <key> [<values>...] [GLOBAL]"
+                        "GET <map> <key> <variable>"
+                        "MAKE <map> GLOBAL"
+                        "KEYS <map> <variable>"
+                        "CONTAINS <map> <key> <variable>"
+                        ARGN ${ARGN})
 
-    set(keyList ${map}_Keys_)
-    _mcl_map_key(keyVar ${map} ${key})
+    set(keyList ${mclm_map}_Keys_)
+    _mcl_map_key(keyVar ${mclm_map} "${mclm_key}")
+    message("keyVar: ${keyVar}")
+    message("value: ${${keyVar}}")
 
-    if (operation STREQUAL "SET")
-        _mcl_map_set(${map} ${key} ${keyList} ${keyVar} ${ARGN})
+    if (mclm_SET)
+        _mcl_map_set(${mclm_map} ${mclm_key} ${keyList} ${keyVar} ${mclm_GLOBAL} ${mclm_values})
 
-    elseif (operation STREQUAL "GET")
-        list(LENGTH ARGN argnCount)
-        if (argnCount EQUAL 1)
-            list(GET ARGN 0 variable)
+    elseif (mclm_GET)
+        set(${mclm_variable} ${${keyVar}} PARENT_SCOPE)
 
-            set(${variable} ${${keyVar}} PARENT_SCOPE)
-        elseif (argnCount EQUAL 0)
-            message(FATAL_ERROR "Map GET missing <variable> argument. Function"
-                                "signature is map(GET <map> <key> <variable>).")
-        else()
-            message(FATAL_ERROR "Map GET has extra arguments. Function"
-                                "signature is map(GET <map> <key> <variable>).")
+    elseif (mclm_MAKE)
+        # GLOBAL is currently the only option, so there's no need to check
+        _mcl_map_in_cache(global ${keyList})
+        if (NOT global)
+            _mcl_map_make_global(${mclm_map} ${keyList})
         endif()
 
-    elseif (operation STREQUAL "MAKE")
-        if (state STREQUAL "GLOBAL")
-            _mcl_map_in_cache(global ${keyList})
-            if (NOT global)
-                _mcl_map_make_global(${map} ${keyList})
-            endif()
+    elseif (mclm_KEYS)
+        set(${mclm_variable} ${${keyList}} PARENT_SCOPE)
+
+    elseif (mclm_CONTAINS)
+        list(FIND ${keyList} ${mclm_key} keyIndex)
+        if (keyIndex EQUAL -1)
+            set(${mclm_variable} FALSE PARENT_SCOPE)
         else()
-            message(FATAL_ERROR "Invalid map operation: MAKE <map> GLOBAL is"
-                                "the only valid option for the MAKE operation")
+            set(${mclm_variable} TRUE  PARENT_SCOPE)
         endif()
 
-    elseif (operation STREQUAL "KEYS")
-        set(${variable} ${${keyList}} PARENT_SCOPE)
-
-    elseif (operation STREQUAL "CONTAINS")
-        list(LENGTH ARGN argnCount)
-        if (argnCount EQUAL 1)
-            list(GET ARGN 0 variable)
-
-            list(FIND ${keyList} ${key} keyIndex)
-            if (keyIndex EQUAL -1)
-                set(${variable} FALSE PARENT_SCOPE)
-            else()
-                set(${variable} TRUE  PARENT_SCOPE)
-            endif()
-        elseif (argnCount EQUAL 0)
-            message(FATAL_ERROR "Map CONTAINS missing <variable> argument."
-                                "Function signature is map(CONTAINS <map> <key>"
-                                "<variable>).")
-        else()
-            message(FATAL_ERROR "Map CONTAINS has extra arguments. Function"
-                                "signature is map(CONTAINS <map> <key> "
-                                "<variable>).")
-        endif()
-
-    else()
-        message(FATAL_ERROR "Invalid MCL map operation '${operation}'. Valid"
-                            "operations are: SET, GET, MAKE, KEYS, and CONTAINS")
     endif()
 endfunction()
 
 
-macro(_mcl_map_set map key keyList keyVar)
-    set(_arguments ${ARGN})     # we need to manipulate this list
+macro(_mcl_map_set map key keyList keyVar global)
     set(_tempKeys ${${keyList}})
 
     _mcl_map_in_cache(_global ${keyList})
-    list(GET _arguments -1 _lastArgument)
-    if (_lastArgument STREQUAL "GLOBAL")
+    if (${global})
         if (NOT _global)
             _mcl_map_make_global(${map} ${keyList})
         endif()
-
         set(_global TRUE)
-        list(REMOVE_AT _arguments -1)
     endif()
 
     list(APPEND _tempKeys ${key})
@@ -120,10 +94,10 @@ macro(_mcl_map_set map key keyList keyVar)
     if (_global)
         _mcl_map_docstring(docstring ${map})
 
-        set(${keyVar}  ${_arguments} CACHE INTERNAL ${docstring})
+        set(${keyVar}  ${ARGN} CACHE INTERNAL ${docstring})
         set(${keyList} ${_tempKeys}  CACHE INTERNAL ${docstring})
     else()
-        set(${keyVar}  ${_arguments} PARENT_SCOPE)
+        set(${keyVar}  ${ARGN} PARENT_SCOPE)
         set(${keyList} ${_tempKeys}  PARENT_SCOPE)
     endif()
 endmacro()
