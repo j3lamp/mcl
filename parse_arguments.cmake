@@ -151,13 +151,9 @@ macro(_mcl_parse_arguments_getSpecification)
         set(matchedSpecification)
 
         if (argumentCount GREATER 0)
-            set(specificationPrefixes)
-                # a list of flag parameters for matching against the first
-                # argument to determine which specification should be used
-            set(specificationPrefixIndices)
-                # a list of indices that match entries from the prefix list to
-                # their corresponding specification; because of optional
-                # parameters there can be more than one prefix per specification
+            list(GET arguments 0 firstArgument)
+            set(firstArgument "${prefix}${firstArgument}")
+            set(matchedIndex -1)
             set(specificationDefault  -1)
                 # if there is a prefix that begins with a variable or list
                 # (optionally, or required) it becomes the default specification
@@ -169,14 +165,16 @@ macro(_mcl_parse_arguments_getSpecification)
                 list(GET specifications ${specIndex} specification)
 
                 _mcl_parse_arguments_getPrefixesFromSpec()
+
+                if (NOT matchedIndex EQUAL -1)
+                    break()
+                endif()
             endforeach()
 
             foreach (specificationPrefix ${specificationPrefixes})
                 set(${specificationPrefix} FALSE PARENT_SCOPE)
             endforeach()
 
-            list(GET arguments 0 firstArgument)
-            list(FIND specificationPrefixes ${prefix}${firstArgument} matchedIndex)
             if (matchedIndex EQUAL -1)
                 set(matchedIndex ${specificationDefault})
             endif()
@@ -259,6 +257,11 @@ macro(_mcl_parse_arguments_parseSpecification)
     set(_variableRE "^<(.+)>$")
     set(_listRE     "^<(.+)>...$")
 
+    set(breakAfterFirstRequiredSpec FALSE)
+    if (${ARGC} EQUAL 1 AND ${ARGV0} STREQUAL "STOP_ON_FIRST_REQUIRED")
+        set(breakAfterFirstRequiredSpec TRUE)
+    endif()
+
     set(specNames)
     set(specTypes)
     set(specOptionals)
@@ -283,6 +286,10 @@ macro(_mcl_parse_arguments_parseSpecification)
             _mcl_parse_arguments_appendSpecData(${prefix}${name} "list" ${optional})
         else()
             _mcl_parse_arguments_appendSpecData(${prefix}${specPart} "flag" ${optional})
+        endif()
+
+        if (optional STREQUAL "REQUIRED" AND breakAfterFirstRequiredSpec)
+            break()
         endif()
     endforeach()
 endmacro()
@@ -387,7 +394,7 @@ endmacro()
 
 
 macro(_mcl_parse_arguments_getPrefixesFromSpec)
-    _mcl_parse_arguments_parseSpecification()
+    _mcl_parse_arguments_parseSpecification(STOP_ON_FIRST_REQUIRED)
 
     set(canBeDefault FALSE)
     foreach(index RANGE ${specMaxIndex})
@@ -397,14 +404,12 @@ macro(_mcl_parse_arguments_getPrefixesFromSpec)
             type STREQUAL "list")
             set(canBeDefault TRUE)
         elseif (type STREQUAL "flag")
-            list(APPEND specificationPrefixes      ${name})
-            list(APPEND specificationPrefixIndices ${specIndex})
+            if (${firstArgument} STREQUAL ${name})
+                set(matchedIndex ${specIndex})
+                break()
+            endif()
         else()
             message(FATAL_ERROR "we should never get here")
-        endif()
-
-        if (NOT optional)
-            break()
         endif()
     endforeach()
 
