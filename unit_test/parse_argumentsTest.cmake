@@ -24,6 +24,7 @@ set(cheese brie swiss american provalone parmesan mozzarella "pepper jack")
 
 set(empty)
 
+
 # variable arguments
 test(variableArgumentsTest oneVariable_correctValueSet)
     mcl_parse_arguments(test1 prefix_ "<one>" ARGN ${val1})

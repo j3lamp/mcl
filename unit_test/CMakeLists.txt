@@ -11,5 +11,6 @@
 #=============================================================================
 
 mcl_add_cmake_test_script(parse_argumentsTest.cmake)
+mcl_add_cmake_test_script(listTest.cmake)
 mcl_add_cmake_test_script(mapTest.cmake)
 mcl_add_cmake_test_script(stringTest.cmake)

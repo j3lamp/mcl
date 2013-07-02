@@ -10,10 +10,12 @@
 # See the License for more information.
 #=============================================================================
 
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.8.3 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/..)
 
-enable_testing()
+include(mcl/test)
 include(mcl/testing/cmake_test)
+
+mcl_enable_check()
 
 add_subdirectory(unit_test)

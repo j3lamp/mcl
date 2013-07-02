@@ -10,6 +10,8 @@
 # See the License for more information.
 #=============================================================================
 
+include(mcl/test)
+
 
 set(_mcl_testing_base_path ${CMAKE_CURRENT_LIST_DIR})
 
@@ -18,7 +20,7 @@ set(_mcl_testing_base_path ${CMAKE_CURRENT_LIST_DIR})
 #-------------------------------------------------------------------------------
 
 #!
-# Usage: mcl_add_cmake_test_script(<scriptName> [<modulePath> [...]])
+# Usage: mcl_add_cmake_test_script(<scriptName> [<modulePaths>...])
 #
 #  Add a CMake test script. This will handle necessary pre-processing, etc. and
 #  set up the test to be runable by CTest.
@@ -34,19 +36,22 @@ function(mcl_add_cmake_test_script scriptName)
     get_filename_component(inputPath ${scriptName} ABSOLUTE)
     set(outputPath "${CMAKE_CURRENT_BINARY_DIR}/${testFile}")
 
-    add_custom_target(${testFile} ALL
-                      ${CMAKE_COMMAND} -P ${_mcl_testing_base_path}/cmake_test_preprocessor.cmake
-                      ${inputPath} ${outputPath}
+    add_custom_command(
+        OUTPUT ${outputPath}
+        COMMAND ${CMAKE_COMMAND} -P ${_mcl_testing_base_path}/cmake_test_preprocessor.cmake
+                ${inputPath} ${outputPath}
+        DEPENDS ${inputPath}
+        COMMENT "Processing CMake test script \"${testName}\""
+        VERBATIM)
 
-                      DEPENDS ${inputPath}
-                      COMMENT "Processing CMake test script \"${testName}\""
-                      VERBATIM)
+    add_custom_target(${testFile} ALL DEPENDS ${outputPath})
 
     #! @todo update to use mcl_add_test once written
-    add_test(${testName} ${CMAKE_COMMAND} -P
-             ${_mcl_testing_base_path}/cmake_test_runner.cmake
-             ${outputPath}
-             ${CMAKE_MODULE_PATH} ${ARGN})
+    mcl_add_test(${testName} ${CMAKE_COMMAND} -P
+                 ${_mcl_testing_base_path}/cmake_test_runner.cmake
+                 ${outputPath}
+                 ${CMAKE_MODULE_PATH} ${ARGN}
+                 DEPENDS ${testFile})
 endfunction()
 
 #-------------------------------------------------------------------------------
