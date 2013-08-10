@@ -41,7 +41,7 @@ endmacro()
 #  Add a test target as add_test() does, if enable_testing() has been called
 #  first. If mcl_enable_check() has been called then <dependencies> will be
 #  added as dependencies of the check target. Additionally any element of the
-#  command can be tagged as a target by prepending [TARGET] to it, these will
+#  command can be marked as a target by prepending [TARGET] to it, these will
 #  also be added as dependencies of the check target.
 #
 #  Example:
@@ -77,7 +77,7 @@ function(_mcl_test_enableCheckWorker)
             add_dependencies(check ${ARGN})
         endif()
     endfunction()
-        # Note that because of the use of ${ARGN} we could not create define
-        # this function inside the mcl_enable_check() macro as it would replace
+        # Note that because of the use of ${ARGN} we could not define this
+        # function inside the mcl_enable_check() macro as it would replace
         # ${ARGN} with nothing, yeilding this function useless.
 endfunction()

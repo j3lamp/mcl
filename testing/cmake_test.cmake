@@ -46,7 +46,6 @@ function(mcl_add_cmake_test_script scriptName)
 
     add_custom_target(${testFile} ALL DEPENDS ${outputPath})
 
-    #! @todo update to use mcl_add_test once written
     mcl_add_test(${testName} ${CMAKE_COMMAND} -P
                  ${_mcl_testing_base_path}/cmake_test_runner.cmake
                  ${outputPath}
@@ -54,10 +53,10 @@ function(mcl_add_cmake_test_script scriptName)
                  DEPENDS ${testFile})
 endfunction()
 
+
 #-------------------------------------------------------------------------------
 # Functions for writing tests
 #-------------------------------------------------------------------------------
-
 
 #!
 #  Define a set up macro for the named test group. The resulting macro will be
