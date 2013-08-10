@@ -17,10 +17,27 @@
 # this one and this one should be empty, save for these comments.
 #
 
+# mcl_bool(<expression>...)
+#
+# e.g. mcl_bool(NOT <variable>)
 function(mcl_invert variable)
     if (${variable})
         set(${variable} FALSE PARENT_SCOPE)
     else()
         set(${variable} TRUE PARENT_SCOPE)
     endif()
+endfunction()
+
+# mcl_math(<expression>...)
+#
+# e.g. mcl_math(MAX <outputVariable> <number>...)
+function(mcl_math_max outputVariable)
+    set(max ${ARGV1})
+    foreach (num ${ARGN})
+        if (${num} GREATER ${max})
+            set(max ${num})
+        endif()
+    endforeach()
+
+    set(${outputVariable} ${max} PARENT_SCOPE)
 endfunction()
