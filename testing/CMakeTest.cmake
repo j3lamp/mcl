@@ -10,7 +10,7 @@
 # See the License for more information.
 #=============================================================================
 
-include(mcl/test)
+include(mcl/Test)
 
 
 set(_mcl_testing_base_path ${CMAKE_CURRENT_LIST_DIR})
@@ -38,7 +38,7 @@ function(mcl_add_cmake_test_script scriptName)
 
     add_custom_command(
         OUTPUT ${outputPath}
-        COMMAND ${CMAKE_COMMAND} -P ${_mcl_testing_base_path}/cmake_test_preprocessor.cmake
+        COMMAND ${CMAKE_COMMAND} -P ${_mcl_testing_base_path}/CMakeTestPreprocessor.cmake
                 ${inputPath} ${outputPath}
         DEPENDS ${inputPath}
         COMMENT "Processing CMake test script \"${testName}\""
@@ -47,7 +47,7 @@ function(mcl_add_cmake_test_script scriptName)
     add_custom_target(${testFile} ALL DEPENDS ${outputPath})
 
     mcl_add_test(${testName} ${CMAKE_COMMAND} -P
-                 ${_mcl_testing_base_path}/cmake_test_runner.cmake
+                 ${_mcl_testing_base_path}/CMakeTestRunner.cmake
                  ${outputPath}
                  ${CMAKE_MODULE_PATH} ${ARGN}
                  DEPENDS ${testFile})
@@ -122,5 +122,5 @@ macro(endtest)
 endmacro()
 
 
-include(mcl/testing/cmake_test_assertions)
-include(mcl/testing/cmake_test_detail)
+include(mcl/testing/CMakeTestAssertions)
+include(mcl/testing/CMakeTestDetail)

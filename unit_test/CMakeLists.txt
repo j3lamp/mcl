@@ -10,7 +10,7 @@
 # See the License for more information.
 #=============================================================================
 
-mcl_add_cmake_test_script(parse_argumentsTest.cmake)
-mcl_add_cmake_test_script(listTest.cmake)
-mcl_add_cmake_test_script(mapTest.cmake)
-mcl_add_cmake_test_script(stringTest.cmake)
+mcl_add_cmake_test_script(ParseArgumentsTest.cmake)
+mcl_add_cmake_test_script(ListTest.cmake)
+mcl_add_cmake_test_script(MapTest.cmake)
+mcl_add_cmake_test_script(StringTest.cmake)

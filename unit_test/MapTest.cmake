@@ -10,7 +10,7 @@
 # See the License for more information.
 #=============================================================================
 
-include(mcl/map)
+include(mcl/Map)
 
 
 macro(EXPECT_MAP_CONTAIN map key)

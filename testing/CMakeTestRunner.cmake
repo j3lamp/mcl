@@ -51,7 +51,7 @@ if (_mcl_ctr_cannotRunTest)
     message(FATAL_ERROR "Cannot run ${_mcl_ctr_thisFile}")
 endif()
 
-include(mcl/testing/cmake_test)
+include(mcl/testing/CMakeTest)
 
 
 include(${_mcl_ctr_testScript})

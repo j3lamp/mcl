@@ -10,7 +10,7 @@
 # See the License for more information.
 #=============================================================================
 
-include(mcl/list)
+include(mcl/List)
 
 
 set(fish 1 2 red blue)

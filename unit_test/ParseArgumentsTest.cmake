@@ -10,7 +10,7 @@
 # See the License for more information.
 #=============================================================================
 
-include(mcl/parse_arguments)
+include(mcl/ParseArguments)
 
 #! @todo looks like death tests could be useful...
 

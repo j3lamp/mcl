@@ -10,7 +10,7 @@
 # See the License for more information.
 #=============================================================================
 
-include(mcl/string)
+include(mcl/String)
 
 
 test(join oneValue_setsOriginal)

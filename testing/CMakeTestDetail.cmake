@@ -10,7 +10,7 @@
 # See the License for more information.
 #=============================================================================
 
-include(mcl/string)
+include(mcl/String)
 
 
 macro(_mcl_cmakeTest_checkFailed)

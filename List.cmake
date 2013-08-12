@@ -10,8 +10,8 @@
 # See the License for more information.
 #=============================================================================
 
-include(mcl/parse_arguments)
-include(mcl/string)
+include(mcl/ParseArguments)
+include(mcl/String)
 
 #!
 # Usage: mcl_list(PROCESS_TAGS <list> <prefix> <tags>...)

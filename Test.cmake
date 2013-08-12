@@ -10,8 +10,8 @@
 # See the License for more information.
 #=============================================================================
 
-include(mcl/list)
-include(mcl/parse_arguments)
+include(mcl/List)
+include(mcl/ParseArguments)
 
 
 #! @todo add an option for excluding tests from all
