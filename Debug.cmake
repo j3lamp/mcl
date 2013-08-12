@@ -12,10 +12,22 @@
 
 include(mcl/uncategorized)
 
+
+#!
+# Usage: mcl_print_var(<var>)
+#
+#  Print a message to STDERR with the name and value of the variable.
+#
 function(mcl_print_var var)
     message("${var}: ${${var}}")
 endfunction()
 
+#!
+# Usage: mcl_print_vars(<var>...)
+#
+#  Print messages to STDERR with the name and value of each variable neatly
+#  lined up.
+#
 function(mcl_print_vars)
     set(varLengths)
     foreach (var ${ARGN})
@@ -33,6 +45,12 @@ function(mcl_print_vars)
     endforeach()
 endfunction()
 
+#!
+# Usage: mcl_print_list(<list>)
+#
+#  Print, to STDERR, the name of the list followed by each of its items
+#  indented.
+#
 function(mcl_print_list list)
     message("${list}:")
     foreach (item ${${list}})
@@ -40,6 +58,14 @@ function(mcl_print_list list)
     endforeach()
 endfunction()
 
+#!
+# Usage: mcl_print_package(<package> [<vars>...])
+#
+#  Print a header naming the package, to STDERR, followed by the standard set of
+#  variables defined when using find_package(). Additionally any varialbes
+#  specified in the arguments will ahve "${package}_" prepended to them and will
+#  also be printed.
+#
 function(mcl_print_package package)
     message("Package ${package}:")
     set(standardVars ${package}_INCLUDE_DIR
