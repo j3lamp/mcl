@@ -62,8 +62,8 @@ endfunction()
 # Usage: mcl_print_package(<package> [<vars>...])
 #
 #  Print a header naming the package, to STDERR, followed by the standard set of
-#  variables defined when using find_package(). Additionally any varialbes
-#  specified in the arguments will ahve "${package}_" prepended to them and will
+#  variables defined when using find_package(). Additionally any variables
+#  specified in the arguments will have "${package}_" prepended to them and will
 #  also be printed.
 #
 function(mcl_print_package package)

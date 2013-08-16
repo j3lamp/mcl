@@ -11,7 +11,7 @@
 #=============================================================================
 
 include(mcl/String)
-include(mcl/uncategorized)
+include(mcl/Bool)
 
 
 #!
@@ -63,8 +63,10 @@ endmacro()
 #               message will be formatted by the message() command.
 #
 macro(EXPECT_FALSE variable)
-    set(__temp_bool ${${variable}})
-    mcl_invert(__temp_bool)
+    # set(__temp_bool ${${variable}})
+    # mcl_invert(__temp_bool)
+
+    mcl_bool(__temp_bool NOT ${variable})
 
     EXPECT_TRUE(__temp_bool ${ARGN})
 endmacro()
