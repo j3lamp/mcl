@@ -10,6 +10,9 @@
 # See the License for more information.
 #=============================================================================
 
+cmake_minimum_required(VERSION 2.8.11 FATAL_ERROR)
+
+
 #!
 # Usage: mcl_auto_handle_libraries(<target>)
 #
@@ -44,6 +47,11 @@ function(mcl_auto_copy_dlls target)
             list(APPEND dlls "${dll}")
         endif()
     endforeach()
+
+    list(LENGTH dlls dllCount)
+    if (dllCount EQUAL 0)
+        return()
+    endif()
 
     get_property(destination TARGET ${target} PROPERTY LOCATION)
     get_filename_component(destination ${destination} PATH)
