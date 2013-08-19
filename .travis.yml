@@ -2,6 +2,6 @@ language: cpp
 script:
     - mkdir build
     - cd build
-    - cmake ..
+    - cmake -DMCL_AUTO_RUN_TESTS=OFF ..
     - make
     - ctest -V
